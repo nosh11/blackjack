@@ -1,31 +1,22 @@
+from settings import *
+
 import math
-import os
 import tkinter as tk
 import random
 
-from BlackJack import BlackJack
-
-FONTS = ["Yu Mincho"]
-FONT_IDX = 0
-PATH = os.path.dirname(__file__).replace("\\", "/")
-
-STRENGTH = {
-    'A': 1,
-    **{str(x): x for x in range(2, 11)},
-    'J': 11,
-    'Q': 12,
-    'K': 13
-}
+from bj import BlackJack
 
 class BlackJackControl:
     def __init__(self):
+        # ルートウィンドウの設定
         self.__root = tk.Tk()
         self.__root.title("Black Jack")
-
-        self.__blackjack = BlackJack()
+        
+        # BlackJackクラスのインスタンス生成
+        self.__bj = BlackJack()
         self.__stand: int
 
-        # ターン表示フレーム
+        # ターン表示フレームの設定
         self.__round_frame = tk.Frame(self.__root, width=10, height=3)
         self.__round_frame.grid(row=0, column=0)
         tk.Label(self.__round_frame, 
@@ -35,17 +26,19 @@ class BlackJackControl:
                   height=1).grid(row=0, column=0, columnspan=10)
         turnFrame = tk.Frame(self.__round_frame)
         turnFrame.grid(row=1, column=7)
-        self.__turn_label = tk.Label(turnFrame, 
-                  text="1",
-                  font=(FONTS[FONT_IDX], 30),
-                  anchor=tk.E).grid(row=0, column=0)
+
+        self.__round_label = tk.StringVar(value="1")
+        tk.Label(turnFrame, 
+                 textvariable=self.__round_label,
+                 font=(FONTS[FONT_IDX], 30),
+                 anchor=tk.E).grid(row=0, column=0)
         tk.Label(turnFrame,
                   text="/3",
                   font=(FONTS[FONT_IDX], 20),
                   anchor=tk.SW,
                   height=2).grid(row=0, column=1)
 
-        # トップウィンドウ - スタートボタン周りのフレーム
+        # トップウィンドウ - スタートボタン周りのフレーム設定
         self.__startButtonFrame = tk.Frame(self.__root, width=20)
         self.__startButtonFrame.grid(row=0, column=1, padx=100, pady=5)
         tk.Label(self.__startButtonFrame, 
@@ -61,20 +54,19 @@ class BlackJackControl:
                   command=self.clicked_start,
                   width=10, height=2).grid(row=1, column=1, ipadx=10)
         
-        # 空フレーム
+        # 空フレームの設定
         empty = tk.Frame(self.__root)
         empty.grid(row=0, column=2)
         tk.Label(empty, text="", width=10).grid(row=0, column=0)
 
-        # トップウィンドウ
+        # トップウィンドウの設定
         self.__bet_frame = tk.Frame(self.__root)
         self.__bet_frame.grid(row=1, column=0, columnspan=3)
 
-        # トップウィンドウ - ベット周りのフレーム
+        # トップウィンドウ - ベット周りのフレーム設定
         self.__betUserFrame = tk.Frame(self.__bet_frame, width=40)
         self.__betUserFrame.grid(row=1, column=0, columnspan=3, sticky=tk.W+tk.E)
-        colors = ['#ff0000', '#0000dd', '#cccc00']
-        self.__betCoinLabel = []
+        self.__betCoinLabel: list[tuple[tk.Label, tk.Label]] = []
         for user in range(3):
             frame = tk.Frame(self.__betUserFrame)
             frame.grid(row=0, column=user, padx=10, pady=10)
@@ -86,7 +78,7 @@ class BlackJackControl:
 
             tk.Label(frame, 
                      text=f"プレイヤー{user+1}", 
-                     foreground=colors[user],
+                     foreground=COLORS[user],
                      font=(FONTS[FONT_IDX], 16)).grid(row=0, column=0, pady=10)
             tk.Label(frame, 
                      text=f"BETCOIN" if random.randint(0, 1000) >= 2 else "BITCOIN", 
@@ -122,6 +114,7 @@ class BlackJackControl:
                       width=11).grid(row=0, column=1, pady=10, padx=5)
 
         
+        # ディーラーフレームの設定
         self.__dealer_frame = tk.Frame(self.__root)
         self.__dealer_frame.grid(row=0, column=1)
         self.__dealer_card_canvas = CardCanvas(self.__dealer_frame)
@@ -139,6 +132,7 @@ class BlackJackControl:
                                                 height=2)
         self.__dealer_strength_label.grid(row=1, column=1, ipadx=5, ipady=5)
 
+        # プレイヤーフレームの設定
         self.__player_frame = tk.Frame(self.__root)
         self.__player_frame.grid(row=1, column=0, columnspan=3)
 
@@ -156,7 +150,7 @@ class BlackJackControl:
 
             tk.Label(frame, 
                      text=f"プレイヤー{user+1}", 
-                     foreground=colors[user],
+                     foreground=COLORS[user],
                      font=(FONTS[FONT_IDX], 16)).grid(row=0, column=0, columnspan=2)
 
             strength_label = tk.Label(frame, 
@@ -177,55 +171,88 @@ class BlackJackControl:
                       font=(FONTS[FONT_IDX], 13),
                       relief=tk.SOLID,
                       borderwidth=1,
+                      command=self.clicked_stand,
                       width=11).grid(row=0, column=0, pady=10, padx=5)
             tk.Button(buttonFrame, 
                       text="Hit",
                       font=(FONTS[FONT_IDX], 13),
                       borderwidth=1,
                       relief=tk.SOLID,
-                      command=lambda user = user: self.clicked_hit(user),
+                      command=self.clicked_hit,
                       width=11).grid(row=1, column=0, pady=10, padx=5)
 
+        # ランキングフレームの設定
+        self.__ranking_frame = tk.Frame(self.__root)
+        tk.Label(self.__ranking_frame,
+                    text="RESULT",
+                    font=(FONTS[FONT_IDX], 33, "bold"),
+                    width=10, height=1).grid(row=0, column=0, columnspan=2)
+        tk.Button(self.__ranking_frame,
+                    text="RETRY",
+                    relief=tk.SOLID,
+                    font=(FONTS[FONT_IDX], 20),
+                    foreground='#ffffff',
+                    background='#ED7D31',
+                    command=self.clicked_retry,
+                    width=10, height=1).grid(row=2, column=0, ipadx=10, pady = 10)
+        tk.Button(self.__ranking_frame,
+                    text="EXIT",
+                    relief=tk.SOLID,
+                    font=(FONTS[FONT_IDX], 20),
+                    foreground='#ffffff',
+                    background='#5B9BD5',
+                    command=self.clicked_exit,
+                    width=10, height=1).grid(row=2, column=1, ipadx=10, pady = 10)
 
-        # todo: らんきんぐ
-
-        
-        self.__mv_topwindow()
-        self.__coin_display()
+        self.__ranking_display()
         self.__root.mainloop()
 
+        # 初期画面の設定
+        # self.__mv_topwindow()
+        # self.__coin_display()
+        # self.__root.mainloop()
+
     def clicked_increase(self, user: int):
-        self.__blackjack.bet(user, 10)
+        self.__bj.bet(user, 10)
         self.__coin_display()
 
     def clicked_decrease(self, user: int):
-        self.__blackjack.bet(user, -10)
+        self.__bj.bet(user, -10)
         self.__coin_display()
 
     def clicked_start(self):
-        cards, strength = self.__blackjack.start()
+        self.__bj.start()
+        self.__stand = 0
         self.__mv_gamewindow()
-        self.__card_display(cards, strength)
+        self.__card_display()
 
-    def clicked_hit(self, user: int):
-        cards, strength = self.__blackjack.hit()
-        self.__card_display(cards, strength)
+    def clicked_hit(self):
+        if self.__bj.hit(self.__stand):
+            self.clicked_stand()
+        self.__card_display()
 
     def clicked_stand(self):
         self.__stand += 1
-        if not self.__stand % 3 == 0:
-            self.__blackjack.stand()
+        if self.__stand < 3:
             self.__card_display()
         else:
-            self.__blackjack.dealer()
-            self.__mv_topwindow()
+            self.__bj.dealer()
+            self.__bj.judge()
+            self.__card_display()
+            self.__bj.add_round()
+            if (self.__bj.round > 3):
+                self.__root.after(4000, self.__ranking_display)
+            else:
+                self.__round_label.set(str(self.__bj.round))
+                self.__coin_display()
+                self.__root.after(4000, self.__mv_topwindow)
 
     def clicked_retry(self):
-        self.__blackjack.retry()
+        self.__bj.clear_result()
+        self.__coin_display()
         self.__mv_topwindow()
 
     def clicked_exit(self):
-        self.__blackjack.exit()
         self.__fin_program()
 
     def __mv_topwindow(self):
@@ -234,6 +261,7 @@ class BlackJackControl:
         self.__round_frame.grid(row=0, column=0)
         self.__startButtonFrame.grid(row=0, column=1, padx=100, pady=5)
         self.__bet_frame.grid(row=1, column=0, columnspan=3)
+        self.__ranking_frame.grid_forget()
 
     def __mv_gamewindow(self):
         for card_canvas in self.__player_card_canvas:
@@ -243,116 +271,119 @@ class BlackJackControl:
         self.__round_frame.grid(row=0, column=0)
         self.__startButtonFrame.grid_forget()
         self.__bet_frame.grid_forget()
+        self.__ranking_frame.grid_forget()
 
-    def __card_display(self, cards, strength):
-        coinonhand = self.__blackjack.user_coinonhand
-        betcoin = self.__blackjack.user_betcoin
-        stand = self.__blackjack.stand
+    def __card_display(self):
+        bets = self.__bj.user_betcoins
+        coins = self.__bj.user_coins
+        cards = self.__bj.user_hands
+        strength = self.__bj.user_strengths
+
         for user in range(3):
             self.__player_card_canvas[user].set_card(cards[user])
             self.__player_strength_label[user].config(
-                text=f"${coinonhand[user]} bet: ${betcoin[user]} {strength[user]}"
+                text=f"${coins[user]} bet: ${bets[user]} {strength[user]}"
             )
-
-        self.__dealer_frame.grid(row=0, column=1)
+            if self.__stand == user:
+                self.__player_draw_button_frame[user].grid(row=1, column=1, rowspan=4)
+            else:
+                self.__player_draw_button_frame[user].grid_forget()
+        
+        self.__dealer_card_canvas.set_card(self.__bj.dealer_hands)
+        self.__dealer_strength_label.config(
+            text=f"{self.__bj.dealer_strength}"
+        )
         
 
     def __coin_display(self):
-        bet_coin = self.__blackjack.get_user_betcoin()
-        coin_onhand = self.__blackjack.get_user_coinonhand()
+        bets = self.__bj.user_betcoins
+        coins = self.__bj.user_coins
         for idx in range(3):
-            label: tk.Label = self.__betCoinLabel[idx]
-            label[0].config(text=str(bet_coin[idx]), width=4 + int(max(0, math.log10(max(1, bet_coin[idx]))-3)))
-            label[1].config(text=str(coin_onhand[idx]), width=3 + int(max(0, math.log10(max(1, coin_onhand[idx]))-2)))
+            bet = bets[idx]
+            coin = coins[idx]
 
-    def __ranking_display(self):
-        pass
+            width_0 = 4 + int(max(0, math.log10(max(1, bet))-3))
+            width_1 = 3 + int(max(0, math.log10(max(1, coin))-2))
+
+            labels = self.__betCoinLabel[idx]
+            labels[0].config(text=str(bet), width=width_0)
+            labels[1].config(text=str(coin), width=width_1)
 
     def __fin_program(self):
-        pass
+        self.__root.destroy()
+
+    def __ranking_display(self):
+        self.__player_frame.grid_forget()
+        self.__dealer_frame.grid_forget()
+        self.__round_frame.grid_forget()
+        self.__startButtonFrame.grid_forget()
+        self.__bet_frame.grid_forget()
+
+        self.__ranking_frame.grid(row=0, column=0)
+        Podium(self.__ranking_frame, self.__bj.user_names, self.__bj.user_coins).grid(row=1, column=0, columnspan=2,  padx=100)        
 
 
 
 class CardCanvas(tk.Canvas):
-    MARKS = ["spade", "club", "heart", "diamond"] # 並び順は
     def __init__(self, master):
         super().__init__(master, width=156, height=220)
-        self.index = 0
-        self.photos = [None, None]
+        self.photos = []
 
     def clear(self):
         self.delete("all")
-        self.photos = [None, None]
+        self.photos = []
 
     def draw(self):
-        if self.photos[1]:
-            self.create_image(88, 120, image=self.photos[1])
-        if self.photos[0]:
-            self.create_image(68, 100, image=self.photos[0])
+        for i, photo in enumerate(self.photos):
+            if photo:
+                self.create_image(68 + 10 * i, 100 + 10 * i, image=photo)
 
-    def add_card(self, mark: str, strength_str: str):
-        strength_int = STRENGTH[strength_str]
+    def add_card(self, mark: str, strength_int: int):
         strength = str(strength_int).zfill(2)
         photo = tk.PhotoImage(file=f"{PATH}/cards/card_{mark}_{strength}.png")
         if photo.width() == 204:
             photo = photo.zoom(2).subsample(3)
-        self.photos = [photo, self.photos[0]]
+        self.photos.insert(0, photo)
         self.draw()
-    
-    def set_card(self, cards: list):
-        for i in range(2):
-            card = cards[len(cards)-2+i]
-            self.add_card(card[0], card[1])
+
+    def set_card(self, cards: list[tuple[str, int]]):
+        self.clear()
+        for mark, strength in cards:
+            self.add_card(mark, strength)
 
 
+S = 5
 
+class Podium(tk.Frame):
+    def __init__(self, master, names: list[str], coins: list[int]):
+        super().__init__(master, width=150*S, height=80*S)
+        tk.Label(self, 
+                 text="2", 
+                 bg="black", 
+                 fg="white",
+                 font=(FONTS[FONT_IDX], 30), 
+                 width=8, height=5).grid(row=5, column=0, rowspan=5, columnspan=2)
+        tk.Label(self, 
+                 text="1", 
+                 bg="black", 
+                 font=(FONTS[FONT_IDX], 30), 
+                 fg="white",
+                 width=8, height=7).grid(row=3, column=2, rowspan=7, columnspan=2)
+        tk.Label(self, 
+                 text="3", 
+                 bg="black", 
+                 font=(FONTS[FONT_IDX], 30), 
+                 fg="white",
+                 width=8, height=3).grid(row=7, column=4, rowspan=3, columnspan=2)
 
-class BlackJackTest:
-    def __init__(self):
-        self.__user_coinonhand = [1000, 10000, 100]
-        self.__user_betcoin = [100, 1000, 100000]
+        POS = [(1, 2), (3, 0), (5, 4)]
 
-        pass
-    
-    @property
-    def user_coinonhand(self):
-        return self.__user_coinonhand
-    
-    @property
-    def user_betcoin(self):
-        return self.__user_betcoin
-    
-
-    @property
-    def stand(self):
-        return 1
-
-    def bet(self, user: int, bc):
-        if self.__user_betcoin[user] <= 10 and bc < 0:
-            return
-        elif (self.__user_coinonhand[user] < bc):
-            return
-        self.__user_betcoin[user] += bc
-        self.__user_coinonhand[user] -= bc
-        return(self.__user_betcoin)
-
-    def start(self):
-        return [[("spade", "J"), ("diamond", "10")], [("spade", "J"), ("diamond", "10")], [("spade", "J"), ("diamond", "10")]], (21, 21, 21)
-
-    def hit(self):
-        return [("spade", "J"), ("diamond", "10")], 21
-
-    def stand(self):
-        pass
-
-    def dealer(self):
-        pass
-
-    def retry(self):
-        pass
-
-    def exit(self):
-        pass
+        for i in range(3):
+            name = names[i]
+            tk.Label(self, 
+                     text=f"{name}",
+                     fg=COLORS[i],
+                     font=(FONTS[FONT_IDX], 20)).grid(row=POS[i][0], column=POS[i][1])
 
 if __name__ == "__main__":
     BlackJackControl()
