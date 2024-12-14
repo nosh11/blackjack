@@ -323,10 +323,11 @@ class BlackJackControl:
         Podium(self.__ranking_frame, self.__bj.user_names, self.__bj.user_coins).grid(row=1, column=0, columnspan=2,  padx=100)        
 
 
+SIZE = 60
 
 class CardCanvas(tk.Canvas):
     def __init__(self, master):
-        super().__init__(master, width=156, height=220)
+        super().__init__(master, width=136+SIZE, height=200+SIZE)
         self.photos = []
 
     def clear(self):
@@ -334,16 +335,19 @@ class CardCanvas(tk.Canvas):
         self.photos = []
 
     def draw(self):
-        for i, photo in enumerate(self.photos):
+        # 下位4つのカードを描画
+        for i, photo in enumerate(self.photos[:4]):
             if photo:
-                self.create_image(68 + 10 * i, 100 + 10 * i, image=photo)
+                self.create_image(68+SIZE//2 - 10 * i, 100+SIZE//2 - 10 * i, image=photo)
 
     def add_card(self, mark: str, strength_int: int):
         strength = str(strength_int).zfill(2)
         photo = tk.PhotoImage(file=f"{PATH}/cards/card_{mark}_{strength}.png")
         if photo.width() == 204:
             photo = photo.zoom(2).subsample(3)
-        self.photos.insert(0, photo)
+        self.photos.append(photo)
+        if (len(self.photos) > 4):
+            self.photos = self.photos[1:]
         self.draw()
 
     def set_card(self, cards: list[tuple[str, int]]):
