@@ -1,5 +1,3 @@
-from enum import Enum
-
 
 class Hands:
     def __init__(self):
@@ -9,8 +7,8 @@ class Hands:
     def clear_hands(self):
         self.hands = []
 
-    def add_hands(self, XXX):
-        self.hands.append(XXX)
+    def add_hands(self, egara:str, suuji:int): #??????????
+        self.hands.append((egara, suuji))
 
     def get_hands_list(self):
         return self.hands
@@ -45,3 +43,4 @@ class Hands:
 
     def get_hands_strength(self):
         return self.hands_strength
+

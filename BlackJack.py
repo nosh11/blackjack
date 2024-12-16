@@ -95,6 +95,22 @@ class BlackJack:
 
 
 class Hands:
-    pass
+    def __init__(self):
+        pass
+    def clear_hands(self):
+        pass
+    def get_hands_list(self):
+        return []
+    def add_hands(self, suit, number):
+        pass
+    def cal_hands_strength(self):
+        pass
+    def get_hands_strength(self):
+        return 0
 class Cards:
-    pass
+    def __init__(self):
+        pass
+    def draw_card(self):
+        return ('spade', 1)
+    def reset_card(self):
+        pass

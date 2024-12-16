@@ -17,9 +17,6 @@ class Cards:
             for num in number:
                 self.__deck.append((su, num))
 
-    def get_deck(self):
-        return self.__deck
-
 class Card:
     def __init__(self, suit: str, strength: int):
         self.__suit = suit
@@ -32,3 +29,12 @@ class Card:
     @property
     def strength(self):
         return self.__strength
+    
+
+
+a = Cards()
+#for _ in range(51):
+#    a.draw_card()
+#print(a.draw_card())
+print(a.draw_card())
+
