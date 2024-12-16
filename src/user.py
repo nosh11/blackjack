@@ -1,4 +1,4 @@
-from hand import Hands
+from src.hand import Hands
 
 
 class User:

@@ -1,4 +1,3 @@
-from settings import STRENGTH
 import random
 
 class Card:

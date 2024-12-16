@@ -1,8 +1,8 @@
 import numpy as np
 
-from card import Deck
-from hand import Hands
-from user import User
+from src.card import Deck
+from src.hand import Hands
+from src.user import User
 
 class BlackJack:
     def __init__(self):
@@ -42,11 +42,13 @@ class BlackJack:
             self.__dealer_hands.add_hands(self.__deck.draw_card())
 
     def renew_coin(self, victory_or_defeat):
+        if len(victory_or_defeat) != 3:
+            raise ValueError("victory_or_defeat must have exactly 3 elements")
         for i in range(3):
             user = self.__users[i]
             user.coin += user.betcoin * victory_or_defeat[i]
-            user.betcoin = 0
-            self.bet(i, 10)
+            user.betcoin = 10
+
 
     def ranking(self):
         user_list = []

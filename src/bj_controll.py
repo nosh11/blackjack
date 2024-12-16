@@ -1,4 +1,4 @@
-from settings import *
+from src.settings import *
 
 import math
 import tkinter as tk
