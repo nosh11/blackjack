@@ -17,4 +17,18 @@ class Hands:
 
     @property
     def hand_strength(self):
-        return sum([card.strength for card in self.hands])
+        strength = 0
+        ace_count = 0
+        for card in self.__hands:
+            if card.strength == 1:
+                ace_count += 1
+            elif card.strength >= 10:
+                strength += 10
+            else:
+                strength += card.strength
+        for _ in range(ace_count):
+            if strength + 11 <= 21:
+                strength += 11
+            else:
+                strength += 1
+        return strength

@@ -14,7 +14,6 @@ class BlackJackControl:
         
         # BlackJackクラスのインスタンス生成
         self.__bj = BlackJack()
-        self.__stand: int
 
         # ターン表示フレームの設定
         self.__round_frame = tk.Frame(self.__root, width=10, height=3)
@@ -203,14 +202,9 @@ class BlackJackControl:
                     background='#5B9BD5',
                     command=self.clicked_exit,
                     width=10, height=1).grid(row=2, column=1, ipadx=10, pady = 10)
-
-        self.__ranking_display()
+        self.__mv_topwindow()
+        self.__coin_display()
         self.__root.mainloop()
-
-        # 初期画面の設定
-        # self.__mv_topwindow()
-        # self.__coin_display()
-        # self.__root.mainloop()
 
     def clicked_increase(self, user: int):
         self.__bj.bet(user, 10)
@@ -222,40 +216,30 @@ class BlackJackControl:
 
     def clicked_start(self):
         self.__bj.start()
-        self.__stand = 0
         self.__mv_gamewindow()
         self.__card_display()
 
     def clicked_hit(self):
-        if self.__bj.hit(self.__stand):
-            self.clicked_stand()
+        self.__bj.hit()
         self.__card_display()
+        if self.__bj.get_current_player_index() == 3:
+            self.__draw_dealer_hand()
 
     def clicked_stand(self):
-        self.__stand += 1
-        if self.__stand < 3:
-            self.__card_display()
-        else:
-            self.__bj.dealer()
-            self.__bj.judge()
-            self.__card_display()
-            self.__bj.add_round()
-            if (self.__bj.round > 3):
-                self.__root.after(4000, self.__ranking_display)
-            else:
-                self.__round_label.set(str(self.__bj.round))
-                self.__coin_display()
-                self.__root.after(4000, self.__mv_topwindow)
+        self.__bj.stand()
+        self.__card_display()
+        if self.__bj.get_current_player_index() == 3:
+            self.__draw_dealer_hand()
 
     def clicked_retry(self):
         self.__bj.clear_result()
-        self.__coin_display()
         self.__mv_topwindow()
 
     def clicked_exit(self):
-        self.__fin_program()
+        self.__root.destroy()
 
     def __mv_topwindow(self):
+        self.__coin_display()
         self.__player_frame.grid_forget()
         self.__dealer_frame.grid_forget()
         self.__round_frame.grid(row=0, column=0)
@@ -264,6 +248,7 @@ class BlackJackControl:
         self.__ranking_frame.grid_forget()
 
     def __mv_gamewindow(self):
+        self.__card_display()
         for card_canvas in self.__player_card_canvas:
             card_canvas.clear()
         self.__player_frame.grid(row=1, column=0, columnspan=3)
@@ -273,31 +258,51 @@ class BlackJackControl:
         self.__bet_frame.grid_forget()
         self.__ranking_frame.grid_forget()
 
+    def __round_display(self):
+        self.__round_label.set(str(self.__bj.get_round()))
+
     def __card_display(self):
-        bets = self.__bj.user_betcoins
-        coins = self.__bj.user_coins
-        cards = self.__bj.user_hands
-        strength = self.__bj.user_strengths
+        self.__round_display()
+        bets = self.__bj.get_user_betcoins()
+        coins = self.__bj.get_user_coins()
+        cards = self.__bj.get_user_hands()
+        strength = self.__bj.get_user_strengths()
 
         for user in range(3):
             self.__player_card_canvas[user].set_card(cards[user])
             self.__player_strength_label[user].config(
                 text=f"${coins[user]} bet: ${bets[user]} {strength[user]}"
             )
-            if self.__stand == user:
+            if self.__bj.get_current_player_index() == user:
                 self.__player_draw_button_frame[user].grid(row=1, column=1, rowspan=4)
             else:
                 self.__player_draw_button_frame[user].grid_forget()
         
-        self.__dealer_card_canvas.set_card(self.__bj.dealer_hands)
-        self.__dealer_strength_label.config(
-            text=f"{self.__bj.dealer_strength}"
-        )
-        
+        self.__dealer_display()
+    
+    def __dealer_display(self):
+        self.__dealer_card_canvas.set_card(self.__bj.get_dealer_hands())
+        self.__dealer_strength_label.config(text=f"{self.__bj.get_dealer_strength()}")
+
+    def __draw_dealer_hand(self):
+        if self.__bj.get_dealer_strength() >= 17:
+            self.__bj.judge()
+            self.__bj.next_round()
+
+            if self.__bj.get_round() > 3:
+                self.__root.after(3000, self.__ranking_display)
+                return
+            else:
+                self.__root.after(3000, self.__mv_topwindow)
+        else:
+            self.__bj.dealer()
+            self.__dealer_display()
+            self.__root.after(1000, self.__draw_dealer_hand)
 
     def __coin_display(self):
-        bets = self.__bj.user_betcoins
-        coins = self.__bj.user_coins
+        self.__round_display()
+        bets = self.__bj.get_user_betcoins()
+        coins = self.__bj.get_user_coins()
         for idx in range(3):
             bet = bets[idx]
             coin = coins[idx]
@@ -309,21 +314,18 @@ class BlackJackControl:
             labels[0].config(text=str(bet), width=width_0)
             labels[1].config(text=str(coin), width=width_1)
 
-    def __fin_program(self):
-        self.__root.destroy()
-
     def __ranking_display(self):
+        self.__ranking_frame.grid(row=0, column=0)
+        Podium(self.__ranking_frame, self.__bj.get_ranking()).grid(row=1, column=0, columnspan=2,  padx=100)        
+
         self.__player_frame.grid_forget()
         self.__dealer_frame.grid_forget()
         self.__round_frame.grid_forget()
         self.__startButtonFrame.grid_forget()
         self.__bet_frame.grid_forget()
 
-        self.__ranking_frame.grid(row=0, column=0)
-        Podium(self.__ranking_frame, self.__bj.user_names, self.__bj.user_coins).grid(row=1, column=0, columnspan=2,  padx=100)        
 
-
-SIZE = 60
+SIZE = 100
 
 class CardCanvas(tk.Canvas):
     def __init__(self, master):
@@ -338,7 +340,7 @@ class CardCanvas(tk.Canvas):
         # 下位4つのカードを描画
         for i, photo in enumerate(self.photos[:4]):
             if photo:
-                self.create_image(68+SIZE//2 - 10 * i, 100+SIZE//2 - 10 * i, image=photo)
+                self.create_image(68+SIZE//2 - 16 * i, 100+SIZE//2 - 16 * i, image=photo)
 
     def add_card(self, mark: str, strength_int: int):
         strength = str(strength_int).zfill(2)
@@ -359,7 +361,7 @@ class CardCanvas(tk.Canvas):
 S = 5
 
 class Podium(tk.Frame):
-    def __init__(self, master, names: list[str], coins: list[int]):
+    def __init__(self, master, names: list[str]):
         super().__init__(master, width=150*S, height=80*S)
         tk.Label(self, 
                  text="2", 
