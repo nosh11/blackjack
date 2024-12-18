@@ -4,7 +4,7 @@ import math
 import tkinter as tk
 import random
 
-from bj import BlackJack
+from src.bj import BlackJack
 
 class BlackJackControl:
     def __init__(self):

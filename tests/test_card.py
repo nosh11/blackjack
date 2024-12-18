@@ -14,10 +14,14 @@ def test_card_strength():
     card = Card("Diamonds", 12)
     assert card.strength == 12
 
+# Deck class tests
+
+# Test the initialization of the deck
 def test_deck_initialization():
     deck = Deck()
     assert len(deck._Deck__cards) == 52
 
+# Test the draw_card method
 def test_deck_draw_card():
     deck = Deck()
     card = deck.draw_card()
