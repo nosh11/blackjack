@@ -17,12 +17,12 @@ class Hands:
         num1 = 0
         self.hands_strength = 0
         ace_count = 0
-        while num1 < len(self.hands) - 1:
+        while num1 < len(self.hands):
             if self.hands[num1][1] == 'A':
                 ace_count = ace_count + 1
             
             else:
-                if self.hands[num1][1] == 'J' or 'Q' or 'K':
+                if self.hands[num1][1] == 'J' or self.hands[num1][1] =='Q' or self.hands[num1][1] == 'K':
                     self.hands_strength = self.hands_strength + 10
                 
                 else:
