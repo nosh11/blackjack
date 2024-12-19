@@ -38,7 +38,7 @@ class Hands:
             else:
                 self.hands_strength = self.hands_strength + 1
         
-        num2 = num2 + 1
+            num2 = num2 + 1
 
 
     def get_hands_strength(self):
