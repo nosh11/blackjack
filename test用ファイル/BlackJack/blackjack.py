@@ -23,7 +23,8 @@ class BlackJack:
         for user in hand_name:
             draw_time = 0
             while draw_time < 2:
-                user.add_hands(self.__card.draw_card())
+                a = self.__card.draw_card()
+                user.add_hands(a[0], a[1])
                 draw_time += 1
             user.cal_hands_strength()
             userhand_strength.append((user.get_hands_list(), user.get_hands_strength()))

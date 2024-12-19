@@ -21,7 +21,8 @@ class BlackJack:
         for user in hand_name:
             draw_time = 0
             while draw_time < 2:
-                user.add_hands(self.__card.draw_card())
+                a = self.__card.draw_card()
+                user.add_hands(a[0], a[1])
                 draw_time += 1
             user.cal_hands_strength()
             userhand_strength.append((user.get_hands_list(), user.get_hands_strength()))
@@ -92,25 +93,3 @@ class BlackJack:
 
     def get_user_betcoin(self):
         return self.__user_betcoin
-
-
-class Hands:
-    def __init__(self):
-        pass
-    def clear_hands(self):
-        pass
-    def get_hands_list(self):
-        return []
-    def add_hands(self, suit, number):
-        pass
-    def cal_hands_strength(self):
-        pass
-    def get_hands_strength(self):
-        return 0
-class Cards:
-    def __init__(self):
-        pass
-    def draw_card(self):
-        return ('spade', 1)
-    def reset_card(self):
-        pass
