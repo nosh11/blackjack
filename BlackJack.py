@@ -2,8 +2,8 @@ import numpy as np
 
 class BlackJack:
     def __init__(self):
-        self.__user_coinonhand = np.array([[0,0,0],['プレイヤー１','プレイヤー２','プレイヤー３']])
-        self.__user_betcoin = np.array([0,0,0])
+        self.__user_coinonhand = np.array([[100,100,100],['プレイヤー１','プレイヤー２','プレイヤー３']])
+        self.__user_betcoin = np.array([10,10,10])
         self.__user_hands = [Hands(), Hands(), Hands()]
         self.__dealer_hands = Hands()
         self.__card = Cards()
