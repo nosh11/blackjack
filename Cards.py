@@ -19,16 +19,3 @@ class Cards:
 
     def get_deck(self):
         return self.__deck
-
-class Card:
-    def __init__(self, suit: str, strength: int):
-        self.__suit = suit
-        self.__strength = strength
-
-    @property
-    def suit(self):
-        return self.__suit
-    
-    @property
-    def strength(self):
-        return self.__strength

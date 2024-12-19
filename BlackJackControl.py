@@ -3,6 +3,8 @@ import os
 import tkinter as tk
 import random
 
+import numpy as np
+
 from BlackJack import BlackJack
 
 FONTS = ["Yu Mincho"]
@@ -22,7 +24,7 @@ class BlackJackControl:
         self.__root = tk.Tk()
         self.__root.title("Black Jack")
 
-        self.__blackjack = BlackJack()
+        self.__blackjack = BlackJackTest()
         self.__stand: int
 
         # ターン表示フレーム
@@ -307,26 +309,69 @@ class CardCanvas(tk.Canvas):
 
 
 
+class Hands:
+    def __init__(self):
+        self.__clear_hands()
+
+    def clear_hands(self):
+        self.__hands: list[tuple[str, str]] = []
+        self.__strength = 0
+
+    def get_hands_list(self) -> list[tuple[str, str]]:
+        return self.__hands
+    
+    def add_hands(self, suit, number) -> None:
+        self.__hands.append((suit, number))
+
+    def cal_hands_strength(self) -> None:
+        strength = 0
+        ace = 0
+        for number in [x[1] for x in self.__hands]:
+            if number == 'A':
+                ace += 1
+            else:
+                strength += STRENGTH[number]
+        for _ in range(ace):
+            if strength + 11 <= 21:
+                strength += 11
+            else:
+                strength += 1
+        self.__strength = strength
+    
+    def get_hands_strength(self) -> int:
+        return self.__strength
+    
+
+class Cards:
+    def __init__(self):
+        self.__cards = []
+        self.__reset_cards()
+
+    def __reset_cards(self) -> None:
+        self.__cards = [(suit, number) for suit in CardCanvas.MARKS for number in STRENGTH.keys()]
+
+    def draw_card(self) -> tuple[str, str]:
+        card = random.choice(self.__cards)
+        self.__cards.remove(card)
+        return card
+    
+    def reset_cards(self) -> None:
+        self.__reset_cards()
+
+
+
 class BlackJackTest:
     def __init__(self):
-        self.__user_coinonhand = [1000, 10000, 100]
+        self.__user_coinonhand = np.array([
+            [f"プレイヤー{x}" for x in range(3)],
+            [100 for x in range(3)]
+        ])
         self.__user_betcoin = [100, 1000, 100000]
+        self.__user_hands = [Hands() for _ in range(3)]
+        self.__dealer_hands = Hands()
+        self.__card = Cards()
 
-        pass
     
-    @property
-    def user_coinonhand(self):
-        return self.__user_coinonhand
-    
-    @property
-    def user_betcoin(self):
-        return self.__user_betcoin
-    
-
-    @property
-    def stand(self):
-        return 1
-
     def bet(self, user: int, bc):
         if self.__user_betcoin[user] <= 10 and bc < 0:
             return
@@ -353,6 +398,13 @@ class BlackJackTest:
 
     def exit(self):
         pass
+
+    def get_user_betcoin(self):
+        return self.__user_betcoin
+    
+    def get_user_coinonhand(self):
+        return self.__user_coinonhand
+
 
 if __name__ == "__main__":
     BlackJackControl()
