@@ -1,4 +1,6 @@
 import numpy as np
+from Hands import Hands
+from Cards import Cards
 
 class BlackJack:
     def __init__(self):
