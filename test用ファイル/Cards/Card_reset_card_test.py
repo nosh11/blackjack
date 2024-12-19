@@ -3,7 +3,7 @@ import random
 class Cards:
     def __init__(self):
         self.__deck = []
-        self.reset_card()
+        #self.reset_card()
     
     def draw_card(self):
         draw = self.__deck.pop(random.randrange(len(self.__deck)))
@@ -17,6 +17,12 @@ class Cards:
             for num in number:
                 self.__deck.append((su, num))
 
-    def get_deck(self):
+    def get_deck(self):#テスト用ゲッター
         return self.__deck
     
+
+A = Cards()
+print(A.get_deck())
+A.reset_card()
+print(len(A.get_deck()))
+print(A.get_deck())
