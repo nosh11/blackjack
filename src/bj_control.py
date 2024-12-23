@@ -323,6 +323,39 @@ class BlackJackControl:
         self.__bet_frame.grid_forget()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    def __get_round(self):
+        return self.__stand // 3 + 1
+    
+    def __get_current_player_index(self):
+        return self.__current_player_index % 3
+
+    def __go_to_next_player(self):
+        index = self.__get_current_player_index()
+        if self.__users[index].hands.hand_strength >= 21:
+            self.__current_player_index += 1
+            if index == 2:
+                self.__draw_dealer_hand()
+            else:
+                self.__go_to_next_player()
+
+    def stand(self):
+        # 次のプレイヤーに移る。
+        self.__current_player_index += 1
+        self.__go_to_next_player()
+
+
 MAX_VIEW_CARD = 5
 MOVE_AMOUNT = 20
 
