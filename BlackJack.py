@@ -30,8 +30,8 @@ class BlackJack:
 
     def hit(self, n):
         self.hit_card = self.__card.draw_card()
-        self.hit_user_hands = self.__user_hands[n].get_hand_list()
-        self.__user_hands[n].add_hand(self.hit_card)
+        self.hit_user_hands = self.__user_hands[n].get_hands_list()
+        self.__user_hands[n].add_hands(self.hit_card[0], self.hit_card[1])
         self.__user_hands[n].cal_hands_strength()
         return self.hit_user_hands, self.__user_hands[n].get_hands_strength()
     
@@ -45,7 +45,7 @@ class BlackJack:
         return self.__dealer_hands.get_hands_list(), self.__dealer_hands.get_hands_strength()
 
     def renew_coin(self, vod:np.array):
-        self.__user_coinonhand[0] = self.__user_coinonhand[0] + self.__user_betcoin * vod
+        self.__user_coinonhand[0] = np.array([int(x) for x in self.__user_coinonhand[0]]) + self.__user_betcoin * vod
 
     def ranking(self):
         user_list = []

@@ -24,4 +24,9 @@ a = Cards()
 for _ in range(51):
     print(a.draw_card())
 print(a.draw_card())
-print(a.draw_card())
+
+try:
+    print(a.draw_card())
+except(ValueError):
+    print('ValueError')
+
