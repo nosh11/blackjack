@@ -13,10 +13,16 @@ class BlackJack:
 
     def bet(self, user_index: int, add_betcoin: int):
         user = self.__users[user_index]
+
+        # ユーザーがベットできるコイン数が10未満の場合、ベットコインを10にする。
         if (user.betcoin + add_betcoin) < 10:
             add_betcoin = 10 - user.betcoin
+
+        # ユーザーのコイン数がベットコインより少ない場合、ベットコインをコイン数に合わせる。
         if (user.coin - add_betcoin) < 0:
             add_betcoin = user.coin
+
+        # ユーザーのベットコインとコイン数を更新する。
         user.betcoin += add_betcoin
         user.coin -= add_betcoin
     
