@@ -38,10 +38,13 @@ class BlackJack:
         return self.hit_user_hands, self.__user_hands[n].get_hands_strength()
     
     def dealer(self):
-        hands_strength = 16 #値を代入
+        self.__dealer_hands.add_hands('club', '9')###
+        self.__dealer_hands.add_hands('heart', '8')###
+        self.__dealer_hands.cal_hands_strength()###
+        hands_strength = self.__dealer_hands.get_hands_strength()
         while hands_strength < 17:
             self.hit_card = self.__card.draw_card()
-            self.__dealer_hands.add_hands()###
+            self.__dealer_hands.add_hands(self.hit_card[0], self.hit_card[1])
             self.__dealer_hands.cal_hands_strength()
             hands_strength = self.__dealer_hands.get_hands_strength()
         return self.__dealer_hands.get_hands_list(), self.__dealer_hands.get_hands_strength()
@@ -97,5 +100,8 @@ class BlackJack:
         return self.__user_betcoin
 
 
-bj = BlackJack()
-print(bj.dealer())
+bj = BlackJack()###
+print(bj.dealer())###
+
+
+###は変更点
