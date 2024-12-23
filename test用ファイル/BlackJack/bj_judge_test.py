@@ -57,7 +57,8 @@ class BlackJack:
         return user_list
         
     def judge(self):
-        d_hand = self.__dealer_hands.get_hands_strength()
+        d_hand = 22 #ここでディーラーの値変更
+        self.__user_hands = [[('club', '9'), ('heart', '8'), ('diamond', '4')], [('club', '8'), ('heart', '9')], [('club', '7'), ('heart', '7'), ('diamond', '8')]] #ここでプレイヤーのハンド設定
         strength_list = []
         judge_list = [0,0,0]
         for i in range(len(judge_list)):
@@ -76,8 +77,7 @@ class BlackJack:
                     judge_list[k] = 2
                 else:
                     judge_list[k] = 0
-        
-        print()
+
         self.renew_coin(np.array(judge_list))
         self.__card.reset_cards()
         for k in range(len(judge_list)):
@@ -99,6 +99,5 @@ class BlackJack:
 
 
 bj = BlackJack()###
-print(bj.dealer())
-print(bj.judge())###
+
 
