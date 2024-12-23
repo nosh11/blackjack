@@ -61,22 +61,23 @@ class BlackJack:
         strength_list = []
         judge_list = [0,0,0]
         for i in range(len(judge_list)):
-            strength_list[i] = self.__user_hands[i].get_hand_strength()
+            strength_list[i] = self.__user_hands[i].get_hands_strength()
         if d_hand <= 21:
             for k in range(len(judge_list)):
                 if strength_list[k] > d_hand:
                     judge_list[k] = 2
-                else:
-                    if strength_list[k] == d_hand:
-                        judge_list[k] = 1
-            if strength_list[k] > 21:
-                judge_list[k] = 0
+                elif strength_list[k] == d_hand:
+                    judge_list[k] = 1
+                if strength_list[k] > 21:
+                    judge_list[k] = 0
         else:
             for k in range(len(judge_list)):
                 if strength_list[k] <= 21:
                     judge_list[k] = 2
                 else:
                     judge_list[k] = 0
+        
+        print()
         self.renew_coin(np.array(judge_list))
         self.__card.reset_cards()
         for k in range(len(judge_list)):
@@ -98,5 +99,6 @@ class BlackJack:
 
 
 bj = BlackJack()###
+print(bj.dealer())
 print(bj.judge())###
 
