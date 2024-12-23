@@ -95,3 +95,14 @@ class BlackJack:
 
     def get_user_betcoin(self):
         return self.__user_betcoin
+
+    def a(self):
+        return ([i.get_hands_list() for i in self.__user_hands],[i.get_hands_strength() for i in self.__user_hands])
+
+
+
+a = BlackJack()
+a.start()
+print(a.a())
+a.hit(2)
+print(a.a())
