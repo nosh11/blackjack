@@ -1,0 +1,8 @@
+from blackjack import BlackJack
+
+import numpy as np
+
+a = BlackJack()
+print(a.get_user_coinonhand())
+a.renew_coin(np.array([2,1,0]))
+print(a.get_user_coinonhand())

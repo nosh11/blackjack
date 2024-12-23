@@ -47,7 +47,7 @@ class BlackJack:
         return self.__dealer_hands.get_hands_list(), self.__dealer_hands.get_hands_strength()
 
     def renew_coin(self, vod:np.array):
-        self.__user_coinonhand[0] = self.__user_coinonhand[0] + self.__user_betcoin * vod
+        self.__user_coinonhand[0] = np.array([int(x) for x in self.__user_coinonhand[0]]) + self.__user_betcoin * vod
 
     def ranking(self):
         user_list = []
