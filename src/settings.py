@@ -7,10 +7,12 @@ PATH = os.path.dirname(__file__).replace("\\", "/")
 
 COLORS = ['#ff0000', '#0000dd', '#cccc00']
 
-STRENGTH = {
-    'A': 1,
-    **{str(x): x for x in range(2, 11)},
-    'J': 11,
-    'Q': 12,
-    'K': 13
+STRENGTH = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+
+
+MARKS = {
+    "spade": ("♠", "black"),
+    "heart": ("♥", "red"),
+    "diamond": ("♦", "red"),
+    "club": ("♣", "black")
 }

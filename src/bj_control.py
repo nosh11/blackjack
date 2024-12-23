@@ -249,8 +249,6 @@ class BlackJackControl:
 
     def __mv_gamewindow(self):
         self.__card_display()
-        for card_canvas in self.__player_card_canvas:
-            card_canvas.clear()
         self.__player_frame.grid(row=1, column=0, columnspan=3)
         self.__dealer_frame.grid(row=0, column=1)
         self.__round_frame.grid(row=0, column=0)
@@ -269,7 +267,7 @@ class BlackJackControl:
         strength = self.__bj.get_user_strengths()
 
         for user in range(3):
-            self.__player_card_canvas[user].set_card(cards[user])
+            self.__player_card_canvas[user].update_cards(cards[user])
             self.__player_strength_label[user].config(
                 text=f"${coins[user]} bet: ${bets[user]} {strength[user]}"
             )
@@ -281,7 +279,7 @@ class BlackJackControl:
         self.__dealer_display()
     
     def __dealer_display(self):
-        self.__dealer_card_canvas.set_card(self.__bj.get_dealer_hands())
+        self.__dealer_card_canvas.update_cards(self.__bj.get_dealer_hands())
         self.__dealer_strength_label.config(text=f"{self.__bj.get_dealer_strength()}")
 
     def __draw_dealer_hand(self):
@@ -325,38 +323,41 @@ class BlackJackControl:
         self.__bet_frame.grid_forget()
 
 
-SIZE = 100
+MAX_VIEW_CARD = 5
+MOVE_AMOUNT = 20
+
+SIZE = MAX_VIEW_CARD * MOVE_AMOUNT
+
+# 136/2 = 68
 
 class CardCanvas(tk.Canvas):
     def __init__(self, master):
         super().__init__(master, width=136+SIZE, height=200+SIZE)
-        self.photos = []
-
-    def clear(self):
-        self.delete("all")
-        self.photos = []
+        self.cards: list[tuple[str, str]] = []
 
     def draw(self):
-        # 下位4つのカードを描画
-        for i, photo in enumerate(self.photos[:4]):
-            if photo:
-                self.create_image(68+SIZE//2 - 16 * i, 100+SIZE//2 - 16 * i, image=photo)
+        for i, card in enumerate(self.cards):
+            mark, strength = card
 
-    def add_card(self, mark: str, strength_int: int):
-        strength = str(strength_int).zfill(2)
-        photo = tk.PhotoImage(file=f"{PATH}/cards/card_{mark}_{strength}.png")
-        if photo.width() == 204:
-            photo = photo.zoom(2).subsample(3)
-        self.photos.append(photo)
-        if (len(self.photos) > 4):
-            self.photos = self.photos[1:]
+            mark_str, color = MARKS[mark]
+            strength_str = STRENGTH[strength-1]
+
+            # 右下
+            move = MOVE_AMOUNT * i
+            x, y = 136+SIZE - move, 200+SIZE - move
+
+            self.create_rectangle(x - 136, y - 200, x, y, fill="white")
+            
+            self.create_text(x - 116, y - 180, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color)
+            self.create_text(x - 116, y - 150, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color)
+            
+            self.create_text(x - 20, y - 20, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+            self.create_text(x - 20, y - 50, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+            
+    def update_cards(self, cards: list[tuple[str, int]]):
+        self.delete("all")
+        self.cards = cards
         self.draw()
-
-    def set_card(self, cards: list[tuple[str, int]]):
-        self.clear()
-        for mark, strength in cards:
-            self.add_card(mark, strength)
-
 
 S = 5
 
