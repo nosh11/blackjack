@@ -52,7 +52,7 @@ class BlackJack:
     def ranking(self):
         user_list = []
         coin_list = self.__user_coinonhand.T.tolist()
-        for i in sorted(coin_list, key=lambda x: x[0]):
+        for i in sorted(coin_list, key=lambda x: x[0], reverse=True):
             user_list.append(i[1])
         return user_list
         
