@@ -55,11 +55,11 @@ class BlackJack:
         return user_list
         
     def judge(self):
-        d_hand = self.__dealer_hands.get_hand_strength()
+        d_hand = self.__dealer_hands.get_hands_strength()
         strength_list = []
         judge_list = [0,0,0]
         for i in range(len(judge_list)):
-            strength_list[i] = self.__user_hands[i].get_hand_strength()
+            strength_list[i] = self.__user_hands[i].get_hands_strength()
         if d_hand <= 21:
             for k in range(len(judge_list)):
                 if strength_list[k] > d_hand:
