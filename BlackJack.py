@@ -93,3 +93,9 @@ class BlackJack:
 
     def get_user_betcoin(self):
         return self.__user_betcoin
+    
+    def get_dealer_hand(self):
+        return self.__dealer_hands.get_hands_list()
+    
+    def get_user_hands(self):
+        return [i.get_hands_list() for i in self.__user_hands]
