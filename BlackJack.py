@@ -1,4 +1,6 @@
 import numpy as np
+from Hands import Hands
+from Cards import Cards
 
 class BlackJack:
     def __init__(self):
@@ -11,8 +13,9 @@ class BlackJack:
     def bet(self, user, betcoin):
         user, bc = user, betcoin
         if not(self.__user_betcoin[user] == 10 and bc < 0):
-            self.__user_betcoin[user] += bc
-            self.__user_coinonhand[0][user] -= bc
+            if  not(int(self.__user_coinonhand[0][user]) == 0 and bc > 0):
+                self.__user_betcoin[user] += bc
+                self.__user_coinonhand[0][user] -= bc
         return self.__user_betcoin
     
     def start(self):
@@ -50,7 +53,7 @@ class BlackJack:
     def ranking(self):
         user_list = []
         coin_list = self.__user_coinonhand.T.tolist()
-        for i in sorted(coin_list, key=lambda x: x[0]):
+        for i in sorted(coin_list, key=lambda x: x[0], reverse=True):
             user_list.append(i[1])
         return user_list
         
@@ -64,11 +67,10 @@ class BlackJack:
             for k in range(len(judge_list)):
                 if strength_list[k] > d_hand:
                     judge_list[k] = 2
-                else:
-                    if strength_list[k] == d_hand:
-                        judge_list[k] = 1
-            if strength_list[k] > 21:
-                judge_list[k] = 0
+                elif strength_list[k] == d_hand:
+                    judge_list[k] = 1
+                if strength_list[k] > 21:
+                    judge_list[k] = 0
         else:
             for k in range(len(judge_list)):
                 if strength_list[k] <= 21:
@@ -99,3 +101,9 @@ class BlackJack:
     
     def get_user_hands(self):
         return [i.get_hands_list() for i in self.__user_hands]
+    
+    def get_user_strength(self):
+        return [i.get_hands_strength() for i in self.__user_hands]
+    
+    def get_dealer_strength(self):
+        return self.__dealer_hands.get_hands_strength()
