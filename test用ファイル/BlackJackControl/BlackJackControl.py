@@ -316,7 +316,7 @@ class BlackJackControl:
 
     def __ranking_display(self):
         self.__ranking_frame.grid(row=0, column=0)
-        Podium(self.__ranking_frame, self.__bj.get_ranking()).grid(row=1, column=0, columnspan=2,  padx=100)        
+        Podium(self.__ranking_frame, self.__bj.ranking()).grid(row=1, column=0, columnspan=2,  padx=100)        
 
         self.__player_frame.grid_forget()
         self.__dealer_frame.grid_forget()

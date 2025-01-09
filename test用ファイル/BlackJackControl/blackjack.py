@@ -43,7 +43,7 @@ class BlackJack:
         hands_strength = self.__dealer_hands.get_hands_strength()
         while hands_strength < 17:
             self.hit_card = self.__card.draw_card()
-            self.__dealer_hands.add_hands(self.hit_card)
+            self.__dealer_hands.add_hands(self.hit_card[0], self.hit_card[1])
             self.__dealer_hands.cal_hands_strength()
             hands_strength = self.__dealer_hands.get_hands_strength()
         return self.__dealer_hands.get_hands_list(), self.__dealer_hands.get_hands_strength()
@@ -79,7 +79,11 @@ class BlackJack:
                 else:
                     judge_list[k] = 0
         self.renew_coin(np.array(judge_list))
-        self.__card.reset_cards()
+        self.__card.reset_card()
+        for i in self.__user_betcoin:
+            i = 10
+        for i in self.__user_coinonhand[0]:
+            i -= 10
         for k in range(len(judge_list)):
             self.__user_hands[k].clear_hands()
         return self.__user_coinonhand[0]

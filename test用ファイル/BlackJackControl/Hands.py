@@ -7,7 +7,7 @@ class Hands:
     def clear_hands(self):
         self.hands = []
 
-    def add_hands(self, egara:str, suuji:int): #??????????
+    def add_hands(self, egara: str, suuji: str): #??????????
         self.hands.append((egara, suuji))
 
     def get_hands_list(self):
