@@ -15,7 +15,7 @@ class BlackJack:
         if not(self.__user_betcoin[user] == 10 and bc < 0):
             if  not(int(self.__user_coinonhand[0][user]) == 0 and bc > 0):
                 self.__user_betcoin[user] += bc
-                self.__user_coinonhand[0][user] -= bc
+                self.__user_coinonhand[0][user] = int(self.__user_coinonhand[0][user]) - bc
         return self.__user_betcoin
     
     def start(self):
@@ -23,6 +23,7 @@ class BlackJack:
         userhand_strength = []
         for user in hand_name:
             draw_time = 0
+            user.clear_hands()
             while draw_time < 2:
                 a = self.__card.draw_card()
                 user.add_hands(a[0], a[1])

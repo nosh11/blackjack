@@ -7,8 +7,8 @@ class Hands:
     def clear_hands(self):
         self.hands = []
 
-    def add_hands(self, egara:str, suuji:int): #??????????
-        self.hands.append((egara, suuji))
+    def add_hands(self, card: tuple[str, str]): #??????????
+        self.hands.append(card)
 
     def get_hands_list(self):
         return self.hands

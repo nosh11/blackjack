@@ -263,10 +263,10 @@ class BlackJackControl:
 
     def __card_display(self):
         self.__round_display()
-        bets = self.__bj.get_user_betcoins()
-        coins = self.__bj.get_user_coins()
+        bets = self.__bj.get_user_betcoin()
+        coins = self.__bj.get_user_coinonhand()
         cards = self.__bj.get_user_hands()
-        strength = self.__bj.get_user_strengths()
+        strength = self.__bj.get_user_strength()
 
         for user in range(3):
             self.__player_card_canvas[user].update_cards(cards[user])
@@ -281,13 +281,12 @@ class BlackJackControl:
         self.__dealer_display()
     
     def __dealer_display(self):
-        self.__dealer_card_canvas.update_cards(self.__bj.get_dealer_hands())
+        self.__dealer_card_canvas.update_cards(self.__bj.get_dealer_hand())
         self.__dealer_strength_label.config(text=f"{self.__bj.get_dealer_strength()}")
 
     def __draw_dealer_hand(self):
         if self.__bj.get_dealer_strength() >= 17:
             self.__bj.judge()
-            self.__bj.next_round()
             self.__stand += 1
 
             if self.__get_round() > 3:
@@ -365,10 +364,9 @@ class CardCanvas(tk.Canvas):
 
     def draw(self):
         for i, card in enumerate(self.cards):
-            mark, strength = card
+            mark, strength_str = card
 
             mark_str, color = MARKS[mark]
-            strength_str = STRENGTH[strength-1]
 
             # 右下
             move = MOVE_AMOUNT * i
