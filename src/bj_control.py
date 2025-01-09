@@ -15,6 +15,9 @@ class BlackJackControl:
         # BlackJackクラスのインスタンス生成
         self.__bj = BlackJack()
 
+        self.__stand = 0
+        self.__lock = False
+
         # ターン表示フレームの設定
         self.__round_frame = tk.Frame(self.__root, width=10, height=3)
         self.__round_frame.grid(row=0, column=0)
@@ -216,20 +219,19 @@ class BlackJackControl:
 
     def clicked_start(self):
         self.__bj.start()
+        self.__lock = False
         self.__mv_gamewindow()
+        self.__go_to_next_player()
         self.__card_display()
 
     def clicked_hit(self):
-        self.__bj.hit()
+        self.__bj.hit(self.__get_current_player_index())
+        self.__go_to_next_player()
         self.__card_display()
-        if self.__bj.get_current_player_index() == 3:
-            self.__draw_dealer_hand()
 
     def clicked_stand(self):
-        self.__bj.stand()
+        self.stand()
         self.__card_display()
-        if self.__bj.get_current_player_index() == 3:
-            self.__draw_dealer_hand()
 
     def clicked_retry(self):
         self.__bj.clear_result()
@@ -257,7 +259,7 @@ class BlackJackControl:
         self.__ranking_frame.grid_forget()
 
     def __round_display(self):
-        self.__round_label.set(str(self.__bj.get_round()))
+        self.__round_label.set(str(self.__get_round()))
 
     def __card_display(self):
         self.__round_display()
@@ -271,7 +273,7 @@ class BlackJackControl:
             self.__player_strength_label[user].config(
                 text=f"${coins[user]} bet: ${bets[user]} {strength[user]}"
             )
-            if self.__bj.get_current_player_index() == user:
+            if self.__get_current_player_index() == user and (not self.__lock):
                 self.__player_draw_button_frame[user].grid(row=1, column=1, rowspan=4)
             else:
                 self.__player_draw_button_frame[user].grid_forget()
@@ -286,8 +288,9 @@ class BlackJackControl:
         if self.__bj.get_dealer_strength() >= 17:
             self.__bj.judge()
             self.__bj.next_round()
+            self.__stand += 1
 
-            if self.__bj.get_round() > 3:
+            if self.__get_round() > 3:
                 self.__root.after(3000, self.__ranking_display)
                 return
             else:
@@ -305,8 +308,8 @@ class BlackJackControl:
             bet = bets[idx]
             coin = coins[idx]
 
-            width_0 = 4 + int(max(0, math.log10(max(1, bet))-3))
-            width_1 = 3 + int(max(0, math.log10(max(1, coin))-2))
+            width_0 = 4 + int(max(0, len(str(bet)) - 3))
+            width_1 = 3 + int(max(0, len(str(coin)) - 2))
 
             labels = self.__betCoinLabel[idx]
             labels[0].config(text=str(bet), width=width_0)
@@ -322,37 +325,29 @@ class BlackJackControl:
         self.__startButtonFrame.grid_forget()
         self.__bet_frame.grid_forget()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     def __get_round(self):
-        return self.__stand // 3 + 1
+        return self.__stand // 4 + 1
     
     def __get_current_player_index(self):
-        return self.__current_player_index % 3
+        return self.__stand % 4
 
     def __go_to_next_player(self):
         index = self.__get_current_player_index()
-        if self.__users[index].hands.hand_strength >= 21:
-            self.__current_player_index += 1
-            if index == 2:
-                self.__draw_dealer_hand()
-            else:
+        if index == 3:
+            self.__lock = True
+            self.__draw_dealer_hand()
+        else:
+            strength = self.__bj.get_user_strengths()[index]
+            if strength >= 21:
+                self.__stand += 1
                 self.__go_to_next_player()
-
+            else:
+                self.__lock = False
+                self.__card_display()
+    
     def stand(self):
         # 次のプレイヤーに移る。
-        self.__current_player_index += 1
+        self.__stand += 1
         self.__go_to_next_player()
 
 

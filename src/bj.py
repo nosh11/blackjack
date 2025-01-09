@@ -8,8 +8,6 @@ class BlackJack:
         self.__users = [User(f"プレイヤー{i+1}", 100, 10) for i in range(3)]
         self.__dealer_hands = Hands()
         self.__deck = Deck()
-        self.__current_player_index = 0
-        self.__round = 1
 
     def bet(self, user_index: int, add_betcoin: int):
         user = self.__users[user_index]
@@ -40,27 +38,10 @@ class BlackJack:
             for _ in range(2):
                 hand.add_hands(self.__deck.draw_card())
 
-        # 4. 現在のプレイヤーのインデックスを0に設定する。
-        self.__current_player_index = 0
-        self.__go_to_next_player()
-
-    def hit(self):
-        user = self.__users[self.__current_player_index]
+    def hit(self, user_index: int):
+        user = self.__users[user_index]
         # ユーザーにカードを1枚配る。
         user.hands.add_hands(self.__deck.draw_card())
-
-        # ユーザーの手札が21を超えた場合、次のプレイヤーに移る。
-        self.__go_to_next_player()
-
-    def __go_to_next_player(self):
-        if self.__current_player_index < 3 and self.__users[self.__current_player_index].hands.hand_strength >= 21:
-            self.__current_player_index += 1
-            self.__go_to_next_player()
-
-    def stand(self):
-        # 次のプレイヤーに移る。
-        self.__current_player_index += 1
-        self.__go_to_next_player()
         
 
     def dealer(self):
@@ -106,9 +87,6 @@ class BlackJack:
         self.__round = 1
 
     def next_round(self):
-        self.__round += 1
-        self.__current_player_index = 0
-
         for user in self.__users:
             if user.coin >= 10:
                 user.betcoin = 10
@@ -138,9 +116,3 @@ class BlackJack:
     
     def get_user_names(self) -> list[str]:
         return [user.name for user in self.__users]
-    
-    def get_round(self) -> int:
-        return self.__round
-    
-    def get_current_player_index(self) -> int:
-        return self.__current_player_index
