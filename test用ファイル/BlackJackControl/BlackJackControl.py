@@ -321,6 +321,7 @@ class BlackJackControl:
     
     def __dealer_display(self):
         card_canvas = self.__dealer_card_canvas
+        card_canvas.delete("all")
         cards = self.__bj.get_dealer_hand()
         for i, card in enumerate(cards):
             mark, strength_str = card
