@@ -78,7 +78,7 @@ class BlackJack:
                 else:
                     judge_list[k] = 0
         self.renew_coin(np.array(judge_list))
-        self.__card.reset_cards()
+        self.__card.reset_card()
         for k in range(len(judge_list)):
             self.__user_hands[k].clear_hands()
         return self.__user_coinonhand[0]
