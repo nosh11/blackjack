@@ -5,7 +5,7 @@ class Cards:
         self.__deck = []
         self.reset_card()
     
-    def draw_card(self):
+    def draw_card(self) -> tuple[str, str]:
         draw = self.__deck.pop(random.randrange(len(self.__deck)))
         return draw
 
