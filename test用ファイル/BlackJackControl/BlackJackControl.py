@@ -6,6 +6,11 @@ import random
 
 from blackjack import BlackJack
 
+MAX_VIEW_CARD = 5
+MOVE_AMOUNT = 20
+
+SIZE = MAX_VIEW_CARD * MOVE_AMOUNT
+
 class BlackJackControl:
     def __init__(self):
         # ルートウィンドウの設定
@@ -119,7 +124,7 @@ class BlackJackControl:
         # ディーラーフレームの設定
         self.__dealer_frame = tk.Frame(self.__root)
         self.__dealer_frame.grid(row=0, column=1)
-        self.__dealer_card_canvas = CardCanvas(self.__dealer_frame)
+        self.__dealer_card_canvas = tk.Canvas(self.__dealer_frame, width=136+SIZE, height=200+SIZE)
         self.__dealer_card_canvas.grid(row=0, column=0, rowspan=3)
         tk.Label(self.__dealer_frame, 
                  text=f"ディーラー", 
@@ -138,7 +143,7 @@ class BlackJackControl:
         self.__player_frame = tk.Frame(self.__root)
         self.__player_frame.grid(row=1, column=0, columnspan=3)
 
-        self.__player_card_canvas: list[CardCanvas] = []
+        self.__player_card_canvas: list[tk.Canvas] = []
         self.__player_strength_label: list[tk.Label] = []
         self.__player_draw_button_frame: list[tk.Frame] = []
 
@@ -146,9 +151,22 @@ class BlackJackControl:
             frame = tk.Frame(self.__player_frame)
             frame.grid(row=0, column=user, padx=10, pady=10)
 
-            card_canvas = CardCanvas(frame)
+
+
+
+
+            # card_canvas = CardCanvas(frame)
+            # card_canvas.grid(row=1, column=0, rowspan=4)
+            # self.__player_card_canvas.append(card_canvas)
+            card_canvas = tk.Canvas(frame, width=136+SIZE, height=200+SIZE)
             card_canvas.grid(row=1, column=0, rowspan=4)
             self.__player_card_canvas.append(card_canvas)
+
+
+
+
+
+
 
             tk.Label(frame, 
                      text=f"プレイヤー{user+1}", 
@@ -269,8 +287,28 @@ class BlackJackControl:
         cards = self.__bj.get_user_hands()
         strength = self.__bj.get_user_strength()
 
+
+
         for user in range(3):
-            self.__player_card_canvas[user].update_cards(cards[user])
+            card_canvas = self.__player_card_canvas[user]
+
+            card_canvas.delete("all")
+
+            for i, card in enumerate(cards[user]):
+                mark, strength_str = card
+                mark_str, color = MARKS[mark]
+                # 右下
+                move = MOVE_AMOUNT * i
+                x, y = 136+SIZE - move, 200+SIZE - move
+
+                card_canvas.create_rectangle(x - 136, y - 200, x, y, fill="white")
+                card_canvas.create_text(x - 116, y - 180, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color)
+                card_canvas.create_text(x - 116, y - 150, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color)
+                card_canvas.create_text(x - 20, y - 20, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+                card_canvas.create_text(x - 20, y - 50, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+
+
+
             self.__player_strength_label[user].config(
                 text=f"${coins[user]} bet: ${bets[user]} {strength[user]}"
             )
@@ -282,7 +320,23 @@ class BlackJackControl:
         self.__dealer_display()
     
     def __dealer_display(self):
-        self.__dealer_card_canvas.update_cards(self.__bj.get_dealer_hand())
+        card_canvas = self.__dealer_card_canvas
+        cards = self.__bj.get_dealer_hand()
+        for i, card in enumerate(cards):
+            mark, strength_str = card
+            mark_str, color = MARKS[mark]
+            # 右下
+            move = MOVE_AMOUNT * i
+            x, y = 136+SIZE - move, 200+SIZE - move
+
+            card_canvas.create_rectangle(x - 136, y - 200, x, y, fill="white")
+            card_canvas.create_text(x - 116, y - 180, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color)
+            card_canvas.create_text(x - 116, y - 150, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color)
+            card_canvas.create_text(x - 20, y - 20, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+            card_canvas.create_text(x - 20, y - 50, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
+
+
+
         self.__dealer_strength_label.config(text=f"{self.__bj.get_dealer_strength()}")
 
     def __draw_dealer_hand(self):
@@ -317,7 +371,40 @@ class BlackJackControl:
 
     def __ranking_display(self):
         self.__ranking_frame.grid(row=0, column=0)
-        Podium(self.__ranking_frame, self.__bj.ranking()).grid(row=1, column=0, columnspan=2,  padx=100)        
+        names = self.__bj.ranking()
+
+        S = 5
+        self.__podium = tk.Frame(self.__ranking_frame, width=150*S, height=80*S)
+        self.__podium.grid(row=1, column=0, columnspan=2,  padx=100)
+        tk.Label(self.__podium, 
+                 text="2", 
+                 bg="black", 
+                 fg="white",
+                 font=(FONTS[FONT_IDX], 30), 
+                 width=8, height=5).grid(row=5, column=0, rowspan=5, columnspan=2)
+        tk.Label(self.__podium, 
+                 text="1", 
+                 bg="black", 
+                 font=(FONTS[FONT_IDX], 30), 
+                 fg="white",
+                 width=8, height=7).grid(row=3, column=2, rowspan=7, columnspan=2)
+        tk.Label(self.__podium, 
+                 text="3", 
+                 bg="black", 
+                 font=(FONTS[FONT_IDX], 30), 
+                 fg="white",
+                 width=8, height=3).grid(row=7, column=4, rowspan=3, columnspan=2)
+
+        POS = [(1, 2), (3, 0), (5, 4)]
+
+        for i in range(3):
+            name = names[i]
+            tk.Label(self.__podium, 
+                     text=f"{name}",
+                     fg=COLORS[i],
+                     font=(FONTS[FONT_IDX], 20)).grid(row=POS[i][0], column=POS[i][1])
+
+
 
         self.__player_frame.grid_forget()
         self.__dealer_frame.grid_forget()
@@ -349,75 +436,6 @@ class BlackJackControl:
         # 次のプレイヤーに移る。
         self.__stand += 1
         self.__go_to_next_player()
-
-
-MAX_VIEW_CARD = 5
-MOVE_AMOUNT = 20
-
-SIZE = MAX_VIEW_CARD * MOVE_AMOUNT
-
-# 136/2 = 68
-
-class CardCanvas(tk.Canvas):
-    def __init__(self, master):
-        super().__init__(master, width=136+SIZE, height=200+SIZE)
-        self.cards: list[tuple[str, str]] = []
-
-    def draw(self):
-        for i, card in enumerate(self.cards):
-            mark, strength_str = card
-
-            mark_str, color = MARKS[mark]
-
-            # 右下
-            move = MOVE_AMOUNT * i
-            x, y = 136+SIZE - move, 200+SIZE - move
-
-            self.create_rectangle(x - 136, y - 200, x, y, fill="white")
-            
-            self.create_text(x - 116, y - 180, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color)
-            self.create_text(x - 116, y - 150, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color)
-            
-            self.create_text(x - 20, y - 20, text=strength_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
-            self.create_text(x - 20, y - 50, text=mark_str, font=(FONTS[FONT_IDX], 20), fill=color, angle=180)
-            
-    def update_cards(self, cards: list[tuple[str, int]]):
-        self.delete("all")
-        self.cards = cards
-        self.draw()
-
-S = 5
-
-class Podium(tk.Frame):
-    def __init__(self, master, names: list[str]):
-        super().__init__(master, width=150*S, height=80*S)
-        tk.Label(self, 
-                 text="2", 
-                 bg="black", 
-                 fg="white",
-                 font=(FONTS[FONT_IDX], 30), 
-                 width=8, height=5).grid(row=5, column=0, rowspan=5, columnspan=2)
-        tk.Label(self, 
-                 text="1", 
-                 bg="black", 
-                 font=(FONTS[FONT_IDX], 30), 
-                 fg="white",
-                 width=8, height=7).grid(row=3, column=2, rowspan=7, columnspan=2)
-        tk.Label(self, 
-                 text="3", 
-                 bg="black", 
-                 font=(FONTS[FONT_IDX], 30), 
-                 fg="white",
-                 width=8, height=3).grid(row=7, column=4, rowspan=3, columnspan=2)
-
-        POS = [(1, 2), (3, 0), (5, 4)]
-
-        for i in range(3):
-            name = names[i]
-            tk.Label(self, 
-                     text=f"{name}",
-                     fg=COLORS[i],
-                     font=(FONTS[FONT_IDX], 20)).grid(row=POS[i][0], column=POS[i][1])
 
 if __name__ == "__main__":
     BlackJackControl()
