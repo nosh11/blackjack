@@ -12,7 +12,7 @@ class BlackJack:
 
     def bet(self, user, betcoin):
         user, bc = user, betcoin
-        if not(self.__user_betcoin[user] == 10 and bc < 0):
+        if (not(self.__user_betcoin[user] <= 10 and bc < 0)):
             if  not(int(self.__user_coinonhand[0][user]) == 0 and bc > 0):
                 self.__user_betcoin[user] += bc
                 self.__user_coinonhand[0][user] = int(self.__user_coinonhand[0][user]) - bc
