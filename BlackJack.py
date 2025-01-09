@@ -12,10 +12,10 @@ class BlackJack:
 
     def bet(self, user, betcoin):
         user, bc = user, betcoin
-        if not(self.__user_betcoin[user] == 10 and bc < 0):
+        if (not(self.__user_betcoin[user] <= 10 and bc < 0)):
             if  not(int(self.__user_coinonhand[0][user]) == 0 and bc > 0):
                 self.__user_betcoin[user] += bc
-                self.__user_coinonhand[0][user] -= bc
+                self.__user_coinonhand[0][user] = int(self.__user_coinonhand[0][user]) - bc
         return self.__user_betcoin
     
     def start(self):
@@ -23,6 +23,7 @@ class BlackJack:
         userhand_strength = []
         for user in hand_name:
             draw_time = 0
+            user.clear_hands()
             while draw_time < 2:
                 a = self.__card.draw_card()
                 user.add_hands(a[0], a[1])
@@ -42,7 +43,7 @@ class BlackJack:
         hands_strength = self.__dealer_hands.get_hands_strength()
         while hands_strength < 17:
             self.hit_card = self.__card.draw_card()
-            self.__dealer_hands.add_hands(self.hit_card)
+            self.__dealer_hands.add_hands(self.hit_card[0], self.hit_card[1])
             self.__dealer_hands.cal_hands_strength()
             hands_strength = self.__dealer_hands.get_hands_strength()
         return self.__dealer_hands.get_hands_list(), self.__dealer_hands.get_hands_strength()
@@ -59,7 +60,7 @@ class BlackJack:
         
     def judge(self):
         d_hand = self.__dealer_hands.get_hands_strength()
-        strength_list = []
+        strength_list = [0,0,0]
         judge_list = [0,0,0]
         for i in range(len(judge_list)):
             strength_list[i] = self.__user_hands[i].get_hands_strength()
@@ -78,7 +79,10 @@ class BlackJack:
                 else:
                     judge_list[k] = 0
         self.renew_coin(np.array(judge_list))
-        self.__card.reset_cards()
+        self.__card.reset_card()
+        for i in range(3):
+            self.__user_betcoin[i] = 0
+            self.bet(i, 10)
         for k in range(len(judge_list)):
             self.__user_hands[k].clear_hands()
         return self.__user_coinonhand[0]
