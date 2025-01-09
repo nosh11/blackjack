@@ -104,4 +104,4 @@ bj = BlackJack()###
 print(bj.dealer())###
 
 
-###は変更点
+###　は変更です
