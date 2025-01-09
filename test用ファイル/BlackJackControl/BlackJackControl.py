@@ -235,6 +235,7 @@ class BlackJackControl:
 
     def clicked_retry(self):
         self.__bj.clear_result()
+        self.__stand = 0
         self.__mv_topwindow()
 
     def clicked_exit(self):
