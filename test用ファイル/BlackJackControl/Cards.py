@@ -6,7 +6,10 @@ class Cards:
         self.reset_card()
     
     def draw_card(self):
-        draw = self.__deck.pop(random.randrange(len(self.__deck)))
+        try:
+            draw = self.__deck.pop(random.randrange(len(self.__deck)))
+        except(ValueError):
+            print('カードがありません')
         return draw
 
     def reset_card(self):

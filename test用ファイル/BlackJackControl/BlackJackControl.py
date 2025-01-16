@@ -3,6 +3,7 @@ from settings import *
 import math
 import tkinter as tk
 import random
+import numpy as np
 
 from blackjack import BlackJack
 
@@ -226,6 +227,7 @@ class BlackJackControl:
         self.__mv_topwindow()
         self.__coin_display()
         self.__root.mainloop()
+        
 
     def clicked_increase(self, user: int):
         self.__bj.bet(user, 10)
